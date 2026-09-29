@@ -35,7 +35,7 @@ docker compose up -d postgres kafka redis
 
 `JWT_SECRET` is mandatory and has no default - the API refuses to start without one of at
 least 32 characters. Every other variable has a default (see
-[Environment variables](#environment-variables)).
+[Environment variables](api/README.md#environment-variables)).
 
 ```bash
 cd api
