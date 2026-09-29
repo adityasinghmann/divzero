@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-DivZeroApplication<divzero-api>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.divzero.DivZeroApplication",
+            "projectName": "divzero-api",
+            "args": "",
+            "envFile": "${workspaceFolder}/api/.env"
+        }
+    ]
+}

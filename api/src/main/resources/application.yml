@@ -1,0 +1,99 @@
+server:
+  port: ${PORT:3000}
+
+spring:
+  application:
+    name: divzero-api
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/divzero}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  cache:
+    type: redis
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: ${REDIS_TIMEOUT_MS:2000}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: com.divzero.event,java.util,java.lang
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true
+    listener:
+      ack-mode: record
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          time_zone: UTC
+
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  jwt:
+    secret: ${JWT_SECRET:}
+    expiration-ms: ${JWT_EXPIRATION_MS:604800000}
+  judge:
+    docker-command: ${DOCKER_COMMAND:docker}
+    docker-image: ${JUDGE_DOCKER_IMAGE:frolvlad/alpine-gxx}
+    workspace-root: ${JUDGE_WORKSPACE_ROOT:}
+    memory: ${JUDGE_MEMORY:256m}
+    cpus: ${JUDGE_CPUS:0.5}
+    execution-timeout-ms: ${JUDGE_EXECUTION_TIMEOUT_MS:10000}
+    compile-timeout-ms: ${JUDGE_COMPILE_TIMEOUT_MS:120000}
+    output-limit-bytes: ${JUDGE_OUTPUT_LIMIT_BYTES:1048576}
+    volume-label: ${JUDGE_VOLUME_LABEL:}
+    pids-limit: ${JUDGE_PIDS_LIMIT:64}
+    read-only-rootfs: ${JUDGE_READ_ONLY_ROOTFS:true}
+    run-as-user: ${JUDGE_RUN_AS_USER:65534:65534}
+    tmpfs-size-bytes: ${JUDGE_TMPFS_SIZE_BYTES:67108864}
+    worker-enabled: ${JUDGE_WORKER_ENABLED:true}
+  kafka:
+    judge-group-id: ${KAFKA_JUDGE_GROUP_ID:divzero-judge-workers}
+    completion-group-id: ${KAFKA_COMPLETION_GROUP_ID:divzero-submission-completion}
+    dead-letter-group-id: ${KAFKA_DLT_GROUP_ID:divzero-dead-letter-handler}
+    retry-max-attempts: ${KAFKA_RETRY_MAX_ATTEMPTS:3}
+    retry-backoff-ms: ${KAFKA_RETRY_BACKOFF_MS:2000}
+    publish-timeout-ms: ${KAFKA_PUBLISH_TIMEOUT_MS:10000}
+    submit-wait-timeout-ms: ${SUBMISSION_RESULT_WAIT_TIMEOUT_MS:5000}
+    topic-partitions: ${KAFKA_TOPIC_PARTITIONS:3}
+    topic-replicas: ${KAFKA_TOPIC_REPLICAS:1}
+    topics:
+      submission-created: ${KAFKA_TOPIC_SUBMISSION_CREATED:divzero.submission.created}
+      submission-completed: ${KAFKA_TOPIC_SUBMISSION_COMPLETED:divzero.submission.completed}
+      submission-created-dlt: ${KAFKA_TOPIC_SUBMISSION_CREATED_DLT:divzero.submission.created.DLT}
+      submission-completed-dlt: ${KAFKA_TOPIC_SUBMISSION_COMPLETED_DLT:divzero.submission.completed.DLT}
+  rate-limit:
+    submissions-per-window: ${RATE_LIMIT_SUBMISSIONS_PER_WINDOW:10}
+    window-seconds: ${RATE_LIMIT_WINDOW_SECONDS:60}
+  cache:
+    problem-list-ttl-seconds: ${CACHE_PROBLEM_LIST_TTL_SECONDS:300}
+    problem-details-ttl-seconds: ${CACHE_PROBLEM_DETAILS_TTL_SECONDS:300}
+    leaderboard-ttl-seconds: ${CACHE_LEADERBOARD_TTL_SECONDS:120}
+
+logging:
+  level:
+    root: INFO
+    com.divzero: INFO
+    org.springframework.security: WARN
